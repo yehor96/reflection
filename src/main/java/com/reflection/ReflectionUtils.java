@@ -1,9 +1,11 @@
 package com.reflection;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,8 +39,11 @@ public class ReflectionUtils {
     // 2. Method accepts an object and calls all of its methods that do not contain parameters
     public static void callMethodsWithoutParamsOf(Object object) throws Exception {
         Class clazz = object.getClass();
-        for (var method : clazz.getMethods()) {
+        for (var method : clazz.getDeclaredMethods()) {
             if (method.getParameterCount() == 0) {
+                if (!startsWith(method, "public")) {
+                    method.setAccessible(true);
+                }
                 method.invoke(object);
             }
         }
@@ -75,7 +80,7 @@ public class ReflectionUtils {
         Class clazz = object.getClass();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            if (field.toString().startsWith("private")) {
+            if (startsWith(field, "private")) {
                 field.setAccessible(true);
                 switch (field.getType().getSimpleName()) {
                     case "int" -> field.set(object, 0);
@@ -102,14 +107,14 @@ public class ReflectionUtils {
         return list;
     }
 
-    static Class[] getInterfaces(Class clazz) {
-        return clazz.getInterfaces();
+    static List<Class> getInterfaces(Class clazz) {
+        return Arrays.asList(clazz.getInterfaces());
     }
 
     static List<Method> getFinalMethods(Object object) {
         List<Method> list = new ArrayList<>();
         Class clazz = object.getClass();
-        for (var method : clazz.getMethods()) {
+        for (var method : clazz.getDeclaredMethods()) {
             if (method.toString().contains("final")) {
                 list.add(method);
             }
@@ -120,10 +125,14 @@ public class ReflectionUtils {
     static List<Method> getNonPublicMethods(Class clazz) {
         List<Method> list = new ArrayList<>();
         for (var method : clazz.getDeclaredMethods()) {
-            if (!method.toString().startsWith("public")) {
+            if (!startsWith(method, "public")) {
                 list.add(method);
             }
         }
         return list;
+    }
+
+    static boolean startsWith(AccessibleObject object, String accessModifier) {
+        return object.toString().startsWith(accessModifier);
     }
 }
