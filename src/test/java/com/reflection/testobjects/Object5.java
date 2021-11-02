@@ -27,4 +27,21 @@ public class Object5 {
         aChar = 'g';
         object5 = new Object();
     }
+
+    @Override
+    public String toString() {
+        return "Object5{" +
+                "visibleText='" + visibleText + '\'' +
+                ", text='" + text + '\'' +
+                ", bol=" + bol +
+                ", integer=" + integer +
+                ", aLong=" + aLong +
+                ", aShort=" + aShort +
+                ", aByte=" + aByte +
+                ", aFloat=" + aFloat +
+                ", aDouble=" + aDouble +
+                ", aChar=" + aChar +
+                ", object5=" + object5 +
+                '}';
+    }
 }
